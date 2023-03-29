@@ -80,8 +80,8 @@ const Home: NextPage = () => {
               <PostView post={post} author={author} key={post.id} />
             ))}
           </div>
+          {user.isSignedIn && <SignOutButton />}
         </div>
-        <SignOutButton />
       </main>
     </>
   );
