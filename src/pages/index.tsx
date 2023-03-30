@@ -3,6 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { LoadingPage, LoadingSpinner } from "~/components/loading";
@@ -77,11 +78,15 @@ const PostView = ({ post, author }: PostViewPropsType) => {
       />
       <div className="flex flex-col">
         <div className="flex gap-1 text-slate-300">
-          <span>{`@${author.username}`}</span>
+          <Link href={`/@${author.username}`}>
+            <span>{`@${author.username}`}</span>
+          </Link>
           <span>·</span>
-          <span>
-            {formatDistanceToNow(post.createdAt, { addSuffix: true })}
-          </span>
+          <Link href={`/post/${post.id}`}>
+            <span>
+              {formatDistanceToNow(post.createdAt, { addSuffix: true })}
+            </span>
+          </Link>
         </div>
         <span className="text-2xl">{post.content}</span>
       </div>
