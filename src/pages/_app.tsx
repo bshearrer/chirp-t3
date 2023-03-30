@@ -2,10 +2,11 @@ import {
   ClerkProvider,
   RedirectToSignIn,
   SignedIn,
-  SignedOut
+  SignedOut,
 } from "@clerk/nextjs";
 import { type AppType } from "next/app";
 import { useRouter } from "next/router";
+import { Toaster } from "react-hot-toast";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -23,6 +24,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       ) : (
         <>
           <SignedIn>
+            <Toaster position="bottom-center" />
             <Component {...pageProps} />
           </SignedIn>
           <SignedOut>

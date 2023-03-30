@@ -4,7 +4,8 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
-import { LoadingPage } from "~/components/loading";
+import { toast } from "react-hot-toast";
+import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api, type RouterOutputs } from "~/utils/api";
 
 const CreatePostWizard = () => {
@@ -16,6 +17,11 @@ const CreatePostWizard = () => {
       onSuccess: () => {
         setInput("");
         void ctx.posts.getAll.invalidate();
+      },
+      onError: (err) => {
+        const errorMessage = err.data?.zodError?.fieldErrors.content;
+        if (errorMessage && errorMessage[0]) toast.error(errorMessage[0]);
+        else toast.error("Something went wrong");
       },
     });
 
@@ -32,18 +38,28 @@ const CreatePostWizard = () => {
       />
       <input
         placeholder="Type some emojis"
-        className="grow bg-transparent text-2xl outline-none"
+        className="grow bg-transparent outline-none"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (!input) return;
+            mutate({ content: input });
+          }
+        }}
         type="text"
         disabled={isPostMutationLoading}
       />
-      <button
-        onClick={() => mutate({ content: input })}
-        disabled={isPostMutationLoading}
-      >
-        Post
-      </button>
+      {input && (
+        <button onClick={() => mutate({ content: input })}>Post</button>
+      )}
+
+      {isPostMutationLoading && (
+        <div className="flex items-center justify-center">
+          <LoadingSpinner size={20} />
+        </div>
+      )}
     </div>
   );
 };
