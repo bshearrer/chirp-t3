@@ -47,7 +47,7 @@ const PostView = ({ post, author }: PostViewPropsType) => {
             {formatDistanceToNow(post.createdAt, { addSuffix: true })}
           </span>
         </div>
-        <span>{post.content}</span>
+        <span className="text-2xl">{post.content}</span>
       </div>
     </div>
   );
