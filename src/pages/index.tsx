@@ -3,6 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api, type RouterOutputs } from "~/utils/api";
 
 const CreatePostWizard = () => {
@@ -52,13 +53,29 @@ const PostView = ({ post, author }: PostViewPropsType) => {
   );
 };
 
+const Feed = () => {
+  const { data, isLoading: isLoadingPosts } = api.posts.getAll.useQuery();
+
+  if (isLoadingPosts) return <LoadingPage />;
+  if (!data) return <div>Something went wrong</div>;
+
+  return (
+    <div className="flex flex-col">
+      {data?.map(({ post, author }) => (
+        <PostView post={post} author={author} key={post.id} />
+      ))}
+    </div>
+  );
+};
+
 const Home: NextPage = () => {
-  const user = useUser();
+  const { isLoaded: userIsLoaded, isSignedIn } = useUser();
 
-  const { data, isLoading } = api.posts.getAll.useQuery();
+  //Start fetching ASAP so that react query cache's the data
+  api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>No data</div>;
+  //return empty div if user isnt loaded
+  if (!userIsLoaded) return <div />;
 
   return (
     <>
@@ -71,16 +88,12 @@ const Home: NextPage = () => {
         <div className="w-full border-x border-slate-400 md:max-w-2xl">
           <div className="border-b border-slate-400 p-4 ">
             <div className="flex justify-center">
-              {!user.isSignedIn && <SignInButton />}
+              {!isSignedIn && <SignInButton />}
             </div>
-            {user.isSignedIn && <CreatePostWizard />}
+            {isSignedIn && <CreatePostWizard />}
           </div>
-          <div className="flex flex-col">
-            {data?.map(({ post, author }) => (
-              <PostView post={post} author={author} key={post.id} />
-            ))}
-          </div>
-          {user.isSignedIn && <SignOutButton />}
+          <Feed />
+          {isSignedIn && <SignOutButton />}
         </div>
       </main>
     </>
