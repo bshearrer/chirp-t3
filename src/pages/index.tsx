@@ -3,11 +3,21 @@ import { formatDistanceToNow } from "date-fns";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { LoadingPage, LoadingSpinner } from "~/components/loading";
+import { useState } from "react";
+import { LoadingPage } from "~/components/loading";
 import { api, type RouterOutputs } from "~/utils/api";
 
 const CreatePostWizard = () => {
+  const [input, setInput] = useState("");
   const { user } = useUser();
+  const ctx = api.useContext();
+  const { mutate, isLoading: isPostMutationLoading } =
+    api.posts.create.useMutation({
+      onSuccess: () => {
+        setInput("");
+        void ctx.posts.getAll.invalidate();
+      },
+    });
 
   if (!user) return null;
 
@@ -22,8 +32,18 @@ const CreatePostWizard = () => {
       />
       <input
         placeholder="Type some emojis"
-        className="grow bg-transparent outline-none"
+        className="grow bg-transparent text-2xl outline-none"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        type="text"
+        disabled={isPostMutationLoading}
       />
+      <button
+        onClick={() => mutate({ content: input })}
+        disabled={isPostMutationLoading}
+      >
+        Post
+      </button>
     </div>
   );
 };
