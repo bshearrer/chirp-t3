@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { PageLayout } from "~/components/layout";
 import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { api, type RouterOutputs } from "~/utils/api";
 
@@ -120,18 +121,19 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <main className="flex h-screen justify-center">
-        <div className="w-full border-x border-slate-400 md:max-w-2xl">
-          <div className="border-b border-slate-400 p-4 ">
+      <PageLayout>
+        <div className="flex border-b border-slate-400 p-4 ">
+          {!isSignedIn && (
             <div className="flex justify-center">
-              {!isSignedIn && <SignInButton />}
+              <SignInButton />
             </div>
-            {isSignedIn && <CreatePostWizard />}
-          </div>
-          <Feed />
-          {isSignedIn && <SignOutButton />}
+          )}
+
+          {isSignedIn && <CreatePostWizard />}
         </div>
-      </main>
+        <Feed />
+        {isSignedIn && <SignOutButton />}
+      </PageLayout>
     </>
   );
 };

@@ -6,13 +6,11 @@ import {
 } from "@clerk/nextjs";
 import { type AppType } from "next/app";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { Toaster } from "react-hot-toast";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  const { pathname } = useRouter();
 
   return (
     <ClerkProvider {...pageProps}>
