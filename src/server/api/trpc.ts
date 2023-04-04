@@ -14,7 +14,7 @@
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
-import { getAuth } from "@clerk/nextjs/server";
+import { clerkClient, getAuth } from "@clerk/nextjs/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { prisma } from "~/server/db";
 /**
@@ -23,18 +23,21 @@ import { prisma } from "~/server/db";
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (opts: CreateNextContextOptions) => {
+export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   //First, get the request session
   const { req } = opts;
 
   //Then, get the user from the session
   const session = getAuth(req);
   const userId = session.userId;
+  const userRoles = userId ? await clerkClient.users.getOrganizationMembershipList({userId}) : null;
+
 
   //Finally, return the context
   return {
     prisma,
     userId,
+    userRoles,
   };
 };
 
@@ -94,6 +97,17 @@ export const publicProcedure = t.procedure;
  * You can use this to enforce authentication on a per-procedure basis.
  */
 const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+
+  if (!ctx.userRoles) throw new TRPCError({code: "UNAUTHORIZED", message: "You must be an admin to do that."})
+  
+    const isMember = ctx.userRoles.some((org) => org.id === "admin");
+    if (!isMember) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be an admin to do that.",
+      });
+    }
+  
   if (!ctx.userId) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
