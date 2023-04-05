@@ -1,14 +1,10 @@
 import { TRPCClientError } from "@trpc/client";
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { type GetStaticProps, type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import SuperJSON from "superjson";
 import { PostView } from "~/components/PostView";
 import { PageLayout } from "~/components/layout";
 import { LoadingPage } from "~/components/loading";
-import { appRouter } from "~/server/api/root";
-import { prisma } from "~/server/db";
 import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 import { api } from "~/utils/api";
 
