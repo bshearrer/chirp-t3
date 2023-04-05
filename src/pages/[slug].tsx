@@ -9,6 +9,7 @@ import { PageLayout } from "~/components/layout";
 import { LoadingPage } from "~/components/loading";
 import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db";
+import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 import { api } from "~/utils/api";
 
 const ProfileFeed = (props: { userId: string }) => {
@@ -62,11 +63,7 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createProxySSGHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null, userRoles: null },
-    transformer: SuperJSON,
-  });
+  const ssg = generateSSGHelper();
 
   const slug = context.params?.slug;
 
