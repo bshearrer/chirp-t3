@@ -97,10 +97,9 @@ export const publicProcedure = t.procedure;
  * You can use this to enforce authentication on a per-procedure basis.
  */
 const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
-
   if (!ctx.userRoles) throw new TRPCError({code: "UNAUTHORIZED", message: "You must be an admin to do that."})
   
-    const isMember = ctx.userRoles.some((org) => org.id === "admin");
+    const isMember = ctx.userRoles.some((role) => role.organization.name === "Admin");
     if (!isMember) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
